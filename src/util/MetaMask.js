@@ -1,4 +1,3 @@
-import blockies from 'blockies';
 import { createIcon } from '@download/blockies';
 
 const initAccount = async () => {
