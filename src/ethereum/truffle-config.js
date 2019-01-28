@@ -19,7 +19,7 @@
  */
 
 const HDWalletProvider = require('truffle-hdwallet-provider');
-if(!process.env["INFURA_KEY"] || process.env["TRUFFLE_CONFIG_PRIVATE_KEY"]) {
+if(!process.env["INFURA_KEY"] || !process.env["TRUFFLE_CONFIG_PRIVATE_KEY"]) {
   throw new Error('Missing: process.env["INFURA_KEY"] or process.env["TRUFFLE_CONFIG_PRIVATE_KEY"]');
 }
 const infuraKey = process.env["INFURA_KEY"];
