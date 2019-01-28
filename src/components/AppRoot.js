@@ -138,7 +138,7 @@ class App extends Component {
               <Grid item xs={12} className="login">
                   {!(window.ethereum && window.ethereum.isMetaMask) && <p className="text-large">This app uses MetaMask for login and transaction approvals.
                       Download the MetaMask extension for your browser to begin.
-                  <a href="https://www.uport.me/" rel="noopener noreferrer" target="_blank">https://metamask.io/</a>
+                  <a href="https://metamask.io/" rel="noopener noreferrer" target="_blank">https://metamask.io/</a>
                   </p>}
                 </Grid >
               )}
