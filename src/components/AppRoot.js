@@ -118,12 +118,12 @@ class App extends Component {
                   {this.state.userName}
                   </Typography>
                   <img style={{borderRadius: '30px'}} src={this.state.avatar.toDataURL()}/>
-                  <Fab onClick={this.handleLogout} variant="extended" color="secondary" className={classes.fab}>
-                    <FingerprintIcon className={classes.extendedIcon} />Log Out
+                  <Fab onClick={this.handleLogout} variant="extended" color="secondary" className={classes.fab + " bold"}>
+                    <FingerprintIcon className={classes.extendedIcon} />SIGN OUT
                   </Fab>
                 </React.Fragment>
-                : <Fab onClick={this.handleLogin} variant="extended" color="secondary" className={classes.fab}>
-                <FingerprintIcon className={classes.extendedIcon} />Login
+                : <Fab onClick={this.handleLogin} variant="extended" color="secondary" className={classes.fab + " bold"}>
+                <FingerprintIcon className={classes.extendedIcon} />SIGN IN
               </Fab>
               }
               

@@ -90,42 +90,49 @@ export class Dashboard extends Component {
         return (
             <React.Fragment>
                 <div className={classes.root}>
-                <Grid container spacing={24}>
-                <Grid item xs={6}>
-                    {this.state.timestamp ?
-                        <p>Data loaded from Ethereum / IPFS: <br />Time saved to block: {new Date(Number(this.state.timestamp + "000")).toUTCString()}</p>
-                        :
-                        <div><h4>No record found for this account.</h4><p>Please enter and submit data on the right</p></div>
-                    }
-                    {this.state.philosophyList.map((item, index) => {
-                        return (<Paper className={classes.paper} key={index}>
-                            {item.myData}
-                        </Paper>);
-                    })}
-                </Grid>
-                <Grid item xs={6}>
-                    <form onSubmit={this.handleSubmit}>
-                        <h4>Imbue Wisdom:</h4>
-                            <TextField
-                                id="standard-multiline-flexible"
-                                label="In accordance with nature"
-                                multiline
-                                rowsMax="4"
-                                onChange={this.handleMyData}
-                                className={classes.textField}
-                                margin="normal"
-                                style={{width: '50%'}}
-                            />
-                        <br />
-                        <Button type="submit" variant="contained" color="primary" className={classes.button}>
-                            Create New Entry
+                    <Grid container spacing={24}>
+                        <Grid item xs={false} sm={false} md={3} lg={3} className={"disable-padding"}>
+                        </Grid>
+                        <Grid item xs={12} sm={12} md={6} lg={6}>
+                            {this.state.timestamp ?
+                                <p>Data loaded from Ethereum / IPFS: <br />Time saved to block: {new Date(Number(this.state.timestamp + "000")).toUTCString()}</p>
+                                :
+                                <div><h4>No philosophy found on this account.</h4><p>Improve the silence.</p></div>
+                            }
+                            {this.state.philosophyList.map((item, index) => {
+                                return (<Paper className={classes.paper} key={index}>
+                                    {item.myData}
+                                </Paper>);
+                            })}
+                        </Grid>
+                        <Grid item xs={false} sm={false} md={3} lg={3} className={"disable-padding"}>
+                        </Grid>
+                        <Grid item xs={false} sm={false} md={3} lg={3} className={"disable-padding"}>
+                        </Grid>
+                        <Grid item xs={12} sm={12} md={6} lg={6}>
+                            <form onSubmit={this.handleSubmit}>
+                                <TextField
+                                    id="standard-multiline-flexible"
+                                    label="In accordance with nature"
+                                    multiline
+                                    rowsMax="4"
+                                    onChange={this.handleMyData}
+                                    className={classes.textField}
+                                    margin="normal"
+                                    style={{ width: '100%' }}
+                                />
+                                <br />
+                                <Button type="submit" variant="contained" color="primary" className={classes.button}>
+                                    Create Philosophy
                         </Button>
-                    </form>
-                </Grid>
-                {this.state.loading &&
-                    <Loader />
-                }
-                </Grid>
+                            </form>
+                        </Grid>
+                        <Grid item xs={false} sm={false} md={3} lg={3} className={"disable-padding"}>
+                        </Grid>
+                        {this.state.loading &&
+                            <Loader />
+                        }
+                    </Grid>
                 </div>
             </React.Fragment>
         )

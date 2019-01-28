@@ -13,11 +13,11 @@ contract Philosophy0x {
     uint public philosophyCount;
 
     mapping (uint => address) public philosophyToPhilosopher;
-    mapping (address => uint[]) private philosopherPhilosophyIds;
-    mapping (uint => uint[]) private philosophyToRevisionList; //TODO
+    mapping (address => uint[]) public philosopherPhilosophyIds;
+    mapping (uint => uint[]) public philosophyToRevisionList; //TODO
     
     function createPhilosophy(string memory _ipfsHash) public {
-        uint id = philosophy.push(Philosophy(msg.sender, _ipfsHash, 0, now)) - 1;
+        uint id = philosophy.push(Philosophy(msg.sender, _ipfsHash, 0, now)) - 1; //Test contract - won't use now in production
         philosopherPhilosophyIds[msg.sender].push(id);
         philosophyToPhilosopher[id] = msg.sender;
         philosophyCount++;

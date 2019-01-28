@@ -103,3 +103,15 @@ body {
     transform: rotate(360deg);
   }
 }
+
+.bold {
+  font-weight: bold!important;
+}
+
+.transition-all {
+  transition: all 0.5s ease-in-out;
+}
+
+.disable-padding {
+  padding: 0px!important;
+}
