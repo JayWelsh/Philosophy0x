@@ -7,7 +7,9 @@ import TextField from '@material-ui/core/TextField';
 import { withStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import Loader from "./Loader"
-import { createPhilosophyHash, getPhilosopherPhilosophyIds, getPhilosophyById } from '../services/Philosophy0x';
+import Typography from '@material-ui/core/Typography';
+import { createPhilosophyHash, getPhilosopherPhilosophyIds, getPhilosophyById, getPhilosophyCount } from '../services/Philosophy0x';
+import { createIcon } from "@download/blockies";
 import { throws } from 'assert';
 
 const styles = theme => ({
@@ -27,6 +29,16 @@ const styles = theme => ({
         flexGrow: 1,
         padding: theme.spacing.unit * 2
     },
+    publicAddress: {
+        display: 'inline-block',
+        position: 'relative',
+        verticalAlign: 'top',
+        top: '12px',
+        paddingLeft: theme.spacing.unit,
+    },
+    publicPhilosopherContainer: {
+        marginBottom: theme.spacing.unit,
+    }
 });
 
 export class Dashboard extends Component {
@@ -34,6 +46,7 @@ export class Dashboard extends Component {
         super();
         this.state = {
             myData: "",
+            publicPhilosophy: [],
             philosophyList: [],
             timestamp: "",
             loading: false,
@@ -58,28 +71,62 @@ export class Dashboard extends Component {
     }
     fetchData = async () => {
         //first get hash from smart contract
-        const philosophyIds = await getPhilosopherPhilosophyIds(this.props.specificNetworkAddress);
-        if(philosophyIds.length > 0){
-            let philosophyOfPhilosopher = [];
-            for(let philosophyIdBN of philosophyIds){
-                let decodedPhilosophyId = parseInt(philosophyIdBN);
-                if (this.state.philosophyIdList.indexOf(decodedPhilosophyId) === -1) {
-                    const philosophyItem = await getPhilosophyById(decodedPhilosophyId);
+        if (this.props.specificNetworkAddress) {
+            const philosophyIds = await getPhilosopherPhilosophyIds(this.props.specificNetworkAddress);
+            if (philosophyIds.length > 0) {
+                let philosophyOfPhilosopher = [];
+                for (let philosophyIdBN of philosophyIds) {
+                    let decodedPhilosophyId = parseInt(philosophyIdBN);
+                    if (this.state.philosophyIdList.indexOf(decodedPhilosophyId) === -1) {
+                        const philosophyItem = await getPhilosophyById(decodedPhilosophyId);
+                        //then get data off IPFS
+                        const ipfsHash = philosophyItem[1];
+                        if (!ipfsHash) { return }
+                        const timestamp = philosophyItem[3].toString();
+                        const details = await getJSON(ipfsHash);
+                        this.setState({
+                            philosophyList: [...this.state.philosophyList, details],
+                            philosophyIdList: [...this.state.philosophyIdList, decodedPhilosophyId],
+                            loading: false,
+                            timestamp
+                        })
+                    }
+                }
+            }
+        }
+        await this.getPublicPhilosophy();
+    }
+
+    getPublicPhilosophy = async () => {
+        //Get public philsophy
+        let publicPhilosophyCount = await getPhilosophyCount();
+        if(publicPhilosophyCount > 0){
+            if(publicPhilosophyCount > 50) {
+                publicPhilosophyCount = 50; //Limit for now
+            }
+            for(let i = 0; i < publicPhilosophyCount; i++){
+                if (this.state.philosophyIdList.indexOf(i) === -1) {
+                    let philosophyItem = await getPhilosophyById(i);
                     //then get data off IPFS
                     const ipfsHash = philosophyItem[1];
                     if (!ipfsHash) { return }
-                    const timestamp = philosophyItem[3].toString();
                     const details = await getJSON(ipfsHash);
+                    const address = philosophyItem[0];
+                    const avatar = await createIcon({
+                        seed: address,
+                        size: 15, // width/height of the icon in blocks, default: 8
+                        scale: 3, // width/height of each block in pixels, default: 4
+                        spotcolor: '#000'
+                    });
+                    const publicPhilosophyItem = { address: address, text: details.myData, avatar: avatar }
                     this.setState({
-                        philosophyList: [...this.state.philosophyList, details],
-                        philosophyIdList: [...this.state.philosophyIdList, decodedPhilosophyId],
-                        loading: false,
-                        timestamp
+                        publicPhilosophy: [...this.state.publicPhilosophy, publicPhilosophyItem],
                     })
                 }
             }
-        }  
+        }
     }
+
     handleMyData = (e) => {
         this.setState({ myData: e.target.value });
     }
@@ -91,44 +138,82 @@ export class Dashboard extends Component {
             <React.Fragment>
                 <div className={classes.root}>
                     <Grid container spacing={24}>
-                        <Grid item xs={false} sm={false} md={3} lg={3} className={"disable-padding"}>
-                        </Grid>
-                        <Grid item xs={12} sm={12} md={6} lg={6}>
-                            {this.state.timestamp ?
-                                <p>Data loaded from Ethereum / IPFS: <br />Time saved to block: {new Date(Number(this.state.timestamp + "000")).toUTCString()}</p>
-                                :
-                                <div><h4>No philosophy found on this account.</h4><p>Improve the silence.</p></div>
-                            }
-                            {this.state.philosophyList.map((item, index) => {
-                                return (<Paper className={classes.paper} key={index}>
-                                    {item.myData}
-                                </Paper>);
-                            })}
-                        </Grid>
-                        <Grid item xs={false} sm={false} md={3} lg={3} className={"disable-padding"}>
-                        </Grid>
-                        <Grid item xs={false} sm={false} md={3} lg={3} className={"disable-padding"}>
-                        </Grid>
-                        <Grid item xs={12} sm={12} md={6} lg={6}>
-                            <form onSubmit={this.handleSubmit}>
-                                <TextField
-                                    id="standard-multiline-flexible"
-                                    label="In accordance with nature"
-                                    multiline
-                                    rowsMax="4"
-                                    onChange={this.handleMyData}
-                                    className={classes.textField}
-                                    margin="normal"
-                                    style={{ width: '100%' }}
-                                />
-                                <br />
-                                <Button type="submit" variant="contained" color="primary" className={classes.button}>
-                                    Create Philosophy
-                        </Button>
-                            </form>
-                        </Grid>
-                        <Grid item xs={false} sm={false} md={3} lg={3} className={"disable-padding"}>
-                        </Grid>
+                        {this.props.specificNetworkAddress &&
+                            <React.Fragment>
+                                <Grid item xs={false} sm={false} md={3} lg={3} className={"disable-padding"}>
+                                </Grid>
+                                <Grid item xs={12} sm={12} md={6} lg={6}>
+                                    {this.state.timestamp ?
+                                        <p>Data loaded from Ethereum / IPFS: <br />Time saved to block: {new Date(Number(this.state.timestamp + "000")).toUTCString()}</p>
+                                        :
+                                        <div>
+                                            <Typography variant="h6" component="h4" color="inherit">
+                                                No philosophy found on this account.
+                                    </Typography>
+                                            <Typography variant="subtitle1" component="p" color="inherit">
+                                                Improve the silence.
+                                    </Typography>
+                                        </div>
+                                    }
+                                    {this.state.philosophyList.map((item, index) => {
+                                        return (<Paper className={classes.paper} key={index}>
+                                            {item.myData}
+                                        </Paper>);
+                                    })}
+                                </Grid>
+                                <Grid item xs={false} sm={false} md={3} lg={3} className={"disable-padding"}>
+                                </Grid>
+                                <Grid item xs={false} sm={false} md={3} lg={3} className={"disable-padding"}>
+                                </Grid>
+                                <Grid item xs={12} sm={12} md={6} lg={6}>
+                                    <form onSubmit={this.handleSubmit}>
+                                        <TextField
+                                            id="standard-multiline-flexible"
+                                            label="In accordance with nature"
+                                            multiline
+                                            rowsMax="4"
+                                            onChange={this.handleMyData}
+                                            className={classes.textField}
+                                            margin="normal"
+                                            style={{ width: '100%' }}
+                                        />
+                                        <br />
+                                        <Button type="submit" variant="contained" color="primary" className={classes.button}>
+                                            Create Philosophy
+                                </Button>
+                                    </form>
+                                </Grid>
+                                <Grid item xs={false} sm={false} md={3} lg={3} className={"disable-padding"}>
+                                </Grid>
+                            </React.Fragment>
+                        }
+                        {this.state.publicPhilosophy &&
+                            <React.Fragment>
+                                <Grid item xs={false} sm={false} md={3} lg={3} className={"disable-padding"}>
+                                </Grid>
+                                <Grid item xs={12} sm={12} md={6} lg={6}>
+                                <Typography variant="h6" component="h4" color="inherit">
+                                    Inspiration from others
+                                </Typography>
+                                    {this.state.publicPhilosophy.map((item, index) => {
+                                        return (
+                                        <Paper className={classes.paper} key={index}>
+                                            <div className={classes.publicPhilosopherContainer}>
+                                            <img style={{borderRadius: '30px',display:'inline-block'}} src={item.avatar.toDataURL()}/>
+                                            <Typography className={classes.publicAddress} variant="subtitle1" component="h3" color="inherit">
+                                                {item.address}
+                                            </Typography>
+                                            </div>
+                                            <Typography variant="subtitle1" component="h3" color="inherit">
+                                            {item.text}
+                                            </Typography>
+                                        </Paper>);
+                                    })}
+                                </Grid>
+                                <Grid item xs={false} sm={false} md={3} lg={3} className={"disable-padding"}>
+                                </Grid>
+                            </React.Fragment>
+                        }
                         {this.state.loading &&
                             <Loader />
                         }

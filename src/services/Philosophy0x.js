@@ -18,6 +18,12 @@ export const createPhilosophyHash = async (account, hash) => {
   return items;
 }
 
+export const getPhilosophyCount = async () => {
+  const instance = await getInstance();
+  const philosophyCountBN = await instance.philosophyCount();
+  return parseInt(philosophyCountBN);
+}
+
 export const getPhilosopherPhilosophyIds = async (account) => {
   const instance = await getInstance();
   const items = await instance.getPhilosopherPhilosophyIds(account);

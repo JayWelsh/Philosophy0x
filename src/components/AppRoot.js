@@ -65,11 +65,13 @@ class App extends Component {
       e.preventDefault();
     }
     const identity = await initAccount();
-    this.setState({
-      specificNetworkAddress: identity.address,
-      userName: identity.address,
-      avatar: identity.avatar
-    })
+    if (identity) {
+      this.setState({
+        specificNetworkAddress: identity.address,
+        userName: identity.address,
+        avatar: identity.avatar
+      })
+    }
   }
 
   handleLogout = async (e) => {
@@ -136,8 +138,12 @@ class App extends Component {
               <Dashboard specificNetworkAddress={this.state.specificNetworkAddress} />
             ) : (
               <Grid item xs={12} className="login">
-                  {!(window.ethereum && window.ethereum.isMetaMask) && <p className="text-large">This app uses MetaMask for login and transaction approvals.
-                      Download the MetaMask extension for your browser to begin.
+                  {window.ethereum && 
+                  <Dashboard specificNetworkAddress={this.state.specificNetworkAddress} />
+                  }
+                  {!(window.ethereum && window.ethereum.isMetaMask) && 
+                  <p className="text-large" style={{paddingLeft: '15px'}}>This app uses MetaMask for login and transaction approvals.
+                      Download the MetaMask extension for your browser to begin. 
                   <a href="https://metamask.io/" rel="noopener noreferrer" target="_blank">https://metamask.io/</a>
                   </p>}
                 </Grid >
