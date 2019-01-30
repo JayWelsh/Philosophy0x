@@ -56,6 +56,12 @@ class App extends Component {
     this.handleLogin();
   }
 
+  componentDidUpdate() {
+    if(this.state.userName === ""){
+      this.handleLogin();
+    }
+  }
+
   toggleDrawer = (menuType, open) => () => {
     this.setState({ [menuType]: open });
   };
@@ -94,7 +100,7 @@ class App extends Component {
     let {classes} = this.props;
     return (
       
-      <div className="App">
+      <div style={{overflow: 'hidden'}}>
         <Drawer open={this.state.leftMenu} onClose={this.toggleDrawer('leftMenu', false)}>
           <div
             tabIndex={0}
@@ -133,7 +139,7 @@ class App extends Component {
           </AppBar>
         </div>
         <Grid container spacing={24}>
-          <Grid item xs={12}>
+          <Grid item xs={12} lg={12}>
             {this.state.userName ? (
               <Dashboard specificNetworkAddress={this.state.specificNetworkAddress} />
             ) : (

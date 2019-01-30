@@ -35,3 +35,21 @@ export const getPhilosophyById = async (philosophyId) => {
   const items = await instance.getPhilosophy(philosophyId);
   return items;
 }
+
+export const editPhilosophyAddNewHash = async (account, hash, id) => {
+  const instance = await getInstance();
+  const items = await instance.revisePhilosophy(hash, id, { from: account });
+  return items;
+}
+
+export const getPhilosophyRevisionIds = async (philosophyId) => {
+  const instance = await getInstance();
+  const philosophyRevisionIds = await instance.getPhilosophyRevisionIds(philosophyId);
+  return philosophyRevisionIds;
+}
+
+export const getPhilosophyRevisionById = async (philosophyRevisionId) => {
+  const instance = await getInstance();
+  const philosophyRevision = await instance.philosophyRevisions(philosophyRevisionId);
+  return philosophyRevision;
+}
