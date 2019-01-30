@@ -118,9 +118,7 @@ export class Dashboard extends Component {
                 }
             });
             if(tripWire){
-                const newEditData = this.state.editData;
-                newEditData.text = philosophyRevisedText;
-                this.setState({philosophyList: newPhilosophyList, loading: false, editData: newEditData});
+                this.setState({philosophyList: newPhilosophyList, loading: false, editData: newEditData, editMode: false, createMode: true, editData: {}});
             }else{
                 this.setState({loading: false})
             }
