@@ -118,7 +118,7 @@ export class Dashboard extends Component {
                 }
             });
             if(tripWire){
-                this.setState({philosophyList: newPhilosophyList, loading: false, editData: newEditData, editMode: false, createMode: true, editData: {}});
+                this.setState({philosophyList: newPhilosophyList, loading: false, editMode: false, createMode: true, editData: {}});
             }else{
                 this.setState({loading: false})
             }
