@@ -57,7 +57,7 @@ class App extends Component {
   }
 
   componentDidUpdate() {
-    if(this.state.userName === ""){
+    if(this.state.userName === "" && (window.ethereum && window.ethereum.selectedAddress)){
       this.handleLogin();
     }
   }
