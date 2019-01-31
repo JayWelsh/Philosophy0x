@@ -280,7 +280,7 @@ export class Dashboard extends Component {
                                     return (
                                     <div className={"flex"} key={index}>
                                         <div className={"flex flex-grow " + classes.itemBottomMargin}>
-                                            <Paper className={classes.paper + " flex-grow"}>
+                                            <Paper className={classes.paper + " flex-grow flex-1"}>
                                                 {item.text}
                                             </Paper>
                                             <Fab onClick={() => this.setEditMode({ id: item.id, text: item.text })} color="primary" aria-label="Revise Philosophy" size="small" className={classes.fab + " vertical-align " + classes.itemMarginLeft}>
