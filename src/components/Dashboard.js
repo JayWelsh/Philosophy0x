@@ -63,6 +63,7 @@ export class Dashboard extends Component {
             createMode: true,
             editMode: false,
             editData: {},
+            isRinkeby: false,
         }
     }
     componentDidMount = async () => {
@@ -87,6 +88,11 @@ export class Dashboard extends Component {
     }
     componentWillUnmount = async () => {
         this._isMounted = false;
+    }
+    componentWillUpdate = () => {
+        if (this._isMounted) {
+            this.checkIsRinkeby();
+        }
     }
     handleSubmit = async (e) => {
         e.preventDefault();
@@ -128,9 +134,13 @@ export class Dashboard extends Component {
 
     checkIsRinkeby = () => {
         if (window.ethereum && window.ethereum.networkVersion == "4") {
-            this.setState({ isRinkeby: true })
+            if (this.state.isRinkeby === false) {
+                this.setState({ isRinkeby: true })
+            }
         } else {
-            this.setState({ isRinkeby: false });
+            if (this.state.isRinkeby === true) {
+                this.setState({ isRinkeby: false });
+            }
         }
     }
 
