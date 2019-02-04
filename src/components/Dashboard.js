@@ -69,6 +69,7 @@ export class Dashboard extends Component {
         this._isMounted = true;
         if (this._isMounted) {
             this.fetchData()
+            this.checkIsRinkeby();
         }
     }
     setEditMode(data) {
@@ -124,6 +125,15 @@ export class Dashboard extends Component {
             }
         }
     }
+
+    checkIsRinkeby = () => {
+        if (window.ethereum && window.ethereum.networkVersion == "4") {
+            this.setState({ isRinkeby: true })
+        } else {
+            this.setState({ isRinkeby: false });
+        }
+    }
+
     handleEditSubmit = async (e) => {
         e.preventDefault();
         const philosophyRevisedText = this.state.myData;
@@ -259,7 +269,7 @@ export class Dashboard extends Component {
             <React.Fragment>
                 <div className={classes.root}>
                     <Grid container spacing={24}>
-                        {this.props.specificNetworkAddress &&
+                        {(this.props.specificNetworkAddress && this.state.isRinkeby) &&
                             <React.Fragment>
                                 <Grid item xs={false} sm={false} md={3} lg={3} className={"disable-padding"}>
                                 </Grid>
@@ -341,23 +351,32 @@ export class Dashboard extends Component {
                                 <Grid item xs={false} sm={false} md={3} lg={3} className={"disable-padding"}>
                                 </Grid>
                                 <Grid item xs={12} sm={12} md={6} lg={6}>
-                                <Typography variant="h6" component="h4" color="inherit">
-                                    Inspiration from others
-                                </Typography>
-                                    {this.state.publicPhilosophy.map((item, index) => {
-                                        return (
-                                        <Paper className={classes.paper + " " + classes.itemBottomMargin} key={index}>
-                                            <div className={classes.publicPhilosopherContainer}>
-                                            <img style={{borderRadius: '30px',display:'inline-block'}} src={item.avatar.toDataURL()}/>
-                                            <Typography className={classes.publicAddress} variant="subtitle1" component="h3" color="inherit">
-                                                {item.address}
-                                            </Typography>
-                                            </div>
-                                            <Typography variant="subtitle1" component="h3" color="inherit">
-                                            {item.text}
-                                            </Typography>
-                                        </Paper>);
-                                    })}
+                                {this.state.isRinkeby &&
+                                    <React.Fragment>
+                                        <Typography variant="h6" component="h4" color="inherit">
+                                            Inspiration from others
+                                        </Typography>
+                                        {this.state.publicPhilosophy.map((item, index) => {
+                                            return (
+                                                <Paper className={classes.paper + " " + classes.itemBottomMargin} key={index}>
+                                                    <div className={classes.publicPhilosopherContainer}>
+                                                        <img style={{ borderRadius: '30px', display: 'inline-block' }} src={item.avatar.toDataURL()} />
+                                                        <Typography className={classes.publicAddress} variant="subtitle1" component="h3" color="inherit">
+                                                            {item.address}
+                                                        </Typography>
+                                                    </div>
+                                                    <Typography variant="subtitle1" component="h3" color="inherit">
+                                                        {item.text}
+                                                    </Typography>
+                                                </Paper>);
+                                        })}
+                                    </React.Fragment>
+                                }
+                                {!this.state.isRinkeby &&
+                                    <Typography variant="h6" component="h4" color="inherit">
+                                        Please switch MetaMask to Rinkeby Network.
+                                    </Typography>
+                                }
                                 </Grid>
                                 <Grid item xs={false} sm={false} md={3} lg={3} className={"disable-padding"}>
                                 </Grid>
