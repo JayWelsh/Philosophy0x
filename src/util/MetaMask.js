@@ -5,7 +5,7 @@ const initAccount = async () => {
     if (typeof window.ethereum !== 'undefined') {
         let ethereum = window.ethereum;
         if(ethereum.isMetaMask){
-            ethereum.enable();
+            await ethereum.enable();
             let address = Web3.utils.toChecksumAddress(ethereum.selectedAddress);
             let avatar = await createIcon({
                 seed: address,

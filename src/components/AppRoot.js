@@ -17,6 +17,11 @@ import ListItemText from '@material-ui/core/ListItemText';
 import HomeIcon from '@material-ui/icons/Home';
 import { withStyles } from '@material-ui/core/styles';
 import { initAccount } from "../util/MetaMask";
+import philosophy0xLogo from "../img/Philosophy0x.png";
+import { connect } from 'react-redux';
+import store from '../state';
+import web3 from 'web3';
+import { setEthereumAccount } from '../state/actions'
 
 const styles = theme => ({
   button: {
@@ -49,16 +54,29 @@ const styles = theme => ({
 class App extends Component {
   constructor(props) {
     super(props)
+    const thisPersist = this;
     this.state = { userName: "", avatar: "", specificNetworkAddress: "", leftMenu: false }
-  }
-
-  componentDidMount() {
-    this.handleLogin();
+    store.subscribe(() => {
+      let reduxState = store.getState();
+      console.log(reduxState);
+      if(reduxState && reduxState.ethereumAccount){
+        this.setState(reduxState.ethereumAccount);
+      }
+    })
+    window.ethereum.on('accountsChanged', function (accounts) {
+      if(thisPersist.state.specificNetworkAddress && (accounts[0] !== thisPersist.state.specificNetworkAddress)){
+        window.location.reload();
+      }
+    })
   }
 
   componentDidUpdate() {
-    if(this.state.userName === "" && (window.ethereum && window.ethereum.selectedAddress)){
-      this.handleLogin();
+    if (web3 && web3.eth && web3.eth.getAccounts) {
+      web3.eth.getAccounts((error, accounts) => {
+        if (accounts.length > 0) {
+          this.handleLogin();
+        }
+      })
     }
   }
 
@@ -72,11 +90,11 @@ class App extends Component {
     }
     const identity = await initAccount();
     if (identity) {
-      this.setState({
+      this.props.dispatch(setEthereumAccount({
         specificNetworkAddress: identity.address,
         userName: identity.address,
         avatar: identity.avatar
-      })
+      }))
     }
   }
 
@@ -112,14 +130,14 @@ class App extends Component {
           </div>
         </Drawer>
         <div className={classes.appBar}>
-          <AppBar position="static">
+          <AppBar position="static" className="our-gradient">
             <Toolbar>
               <IconButton onClick={this.toggleDrawer('leftMenu', true)} className={classes.menuButton} color="inherit" aria-label="Menu">
                 <MenuIcon />
               </IconButton>
-              <Typography variant="h6" component="h1" color="inherit" className={classes.grow}>
-                Philosophy0x
-              </Typography>
+              <div className={classes.grow + " appbar-logo"}>
+                <img src={philosophy0xLogo} alt="Philosophy0x Logo"></img>
+              </div>
               {this.state.userName ?
                 <React.Fragment>
                   <Typography className={classes.extendedIcon} variant="subtitle1" component="h3" color="inherit">
@@ -127,9 +145,12 @@ class App extends Component {
                   </Typography>
                   <img style={{borderRadius: '30px'}} src={this.state.avatar.toDataURL()}/>
                 </React.Fragment>
-                : <Fab onClick={this.handleLogin} variant="extended" color="secondary" className={classes.fab + " bold"}>
-                <FingerprintIcon className={classes.extendedIcon} />SIGN IN
-              </Fab>
+                : 
+                <React.Fragment>
+                  <Fab onClick={this.handleLogin} variant="extended" color="secondary" className={classes.fab + " bold"}>
+                    <FingerprintIcon className={classes.extendedIcon} />SIGN IN
+                  </Fab>
+                </React.Fragment>
               }
               
             </Toolbar>
@@ -142,7 +163,7 @@ class App extends Component {
             ) : (
               <Grid item xs={12} className="login">
                   {window.ethereum && 
-                  <Dashboard specificNetworkAddress={this.state.specificNetworkAddress} />
+                    <Dashboard specificNetworkAddress={this.state.specificNetworkAddress} />
                   }
                   {!(window.ethereum && window.ethereum.isMetaMask) && 
                   <p className="text-large" style={{paddingLeft: '15px'}}>This app uses MetaMask for login and transaction approvals.
@@ -158,4 +179,4 @@ class App extends Component {
   }
 }
 
-export default withStyles(styles)(App);
+export default withStyles(styles)(connect()(App));

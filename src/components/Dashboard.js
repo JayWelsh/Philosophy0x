@@ -11,6 +11,8 @@ import { createPhilosophyHash, getPhilosopherPhilosophyIds, getPhilosophyById, g
 import { createIcon } from "@download/blockies";
 import Fab from '@material-ui/core/Fab';
 import EditIcon from '@material-ui/icons/Edit';
+import { connect } from 'react-redux';
+import store from '../state';
 
 const styles = theme => ({
     button: {
@@ -64,7 +66,16 @@ export class Dashboard extends Component {
             editMode: false,
             editData: {},
             isRinkeby: false,
+            currentAddress: ""
         }
+        store.subscribe(() => {
+            let reduxState = store.getState();
+            if(reduxState && reduxState.ethereumAccount){
+                if(reduxState.ethereumAccount.specificNetworkAddress) {
+                    this.setState({currentAddress: reduxState.ethereumAccount.specificNetworkAddress});
+                }
+            }
+        })
     }
     componentDidMount = async () => {
         this._isMounted = true;
@@ -234,7 +245,7 @@ export class Dashboard extends Component {
                     let ipfsResponse = await getJSON(ipfsHash);
                     details.text = ipfsResponse.myData ? ipfsResponse.myData : ipfsResponse.text;
                     const address = philosophyItem[0];
-                    if (!window.ethereum || !window.ethereum.selectedAddress || (address.toLowerCase() !== window.ethereum.selectedAddress.toLowerCase())) {
+                    if (!window.ethereum || (address.toLowerCase() !== this.state.currentAddress.toLowerCase())) {
                         const avatar = await createIcon({
                             seed: address,
                             size: 15, // width/height of the icon in blocks, default: 8
@@ -284,18 +295,21 @@ export class Dashboard extends Component {
                                 <Grid item xs={false} sm={false} md={3} lg={3} className={"disable-padding"}>
                                 </Grid>
                                 <Grid item xs={12} sm={12} md={6} lg={6}>
-                                    {this.state.timestamp ?
-                                        <p>Data loaded from Ethereum / IPFS: <br />Time saved to block: {new Date(Number(this.state.timestamp + "000")).toUTCString()}</p>
-                                        :
-                                        <div>
-                                            <Typography variant="h6" component="h4" color="inherit">
-                                                No philosophy found on this account.
-                                    </Typography>
-                                            <Typography variant="subtitle1" component="p" color="inherit">
-                                                Improve the silence.
-                                    </Typography>
-                                        </div>
-                                    }
+                                    {(this.state.philosophyList.length > 0) &&
+                                    <React.Fragment>
+                                        <Typography variant="h6" component="h4" color="inherit">
+                                            Inspiration from you
+                                        </Typography>
+                                    </React.Fragment>}
+                                    {(this.state.philosophyList.length === 0) &&
+                                    <div>
+                                        <Typography variant="h6" component="h4" color="inherit">
+                                            No philosophy found from you.
+                                        </Typography>
+                                        <Typography variant="subtitle1" component="p" color="inherit">
+                                            Improve the silence.
+                                        </Typography>
+                                    </div>}
                                     {this.state.philosophyList.map((item, index) => {
                                     return (
                                     <div className={"flex"} key={index}>
@@ -309,18 +323,12 @@ export class Dashboard extends Component {
                                         </div>
                                     </div>);
                                     })}
-                                </Grid>
-                                <Grid item xs={false} sm={false} md={3} lg={3} className={"disable-padding"}>
-                                </Grid>
-                                <Grid item xs={false} sm={false} md={3} lg={3} className={"disable-padding"}>
-                                </Grid>
-                                <Grid item xs={12} sm={12} md={6} lg={6}>
-                                {this.state.createMode && <form onSubmit={this.handleSubmit}>
+                                    {this.state.createMode && <form onSubmit={this.handleSubmit}>
                                     <TextField
                                         id="standard-multiline-flexible"
-                                        label="In accordance with nature"
+                                        label="Write in accordance with nature."
                                         multiline
-                                        rowsMax="4"
+                                        rowsMax="30"
                                         onChange={this.handleMyData}
                                         className={classes.textField}
                                         margin="normal"
@@ -334,9 +342,9 @@ export class Dashboard extends Component {
                                 {this.state.editMode && this.state.editData && <form onSubmit={this.handleEditSubmit}>
                                     <TextField
                                         id="standard-multiline-flexible"
-                                        label="In accordance with nature"
+                                        label="Write in accordance with nature."
                                         multiline
-                                        rowsMax="4"
+                                        rowsMax="30"
                                         onChange={this.handleMyData}
                                         className={classes.textField}
                                         margin="normal"
@@ -363,9 +371,11 @@ export class Dashboard extends Component {
                                 <Grid item xs={12} sm={12} md={6} lg={6}>
                                 {this.state.isRinkeby &&
                                     <React.Fragment>
+                                        {(this.state.publicPhilosophy.length > 0) &&
                                         <Typography variant="h6" component="h4" color="inherit">
                                             Inspiration from others
                                         </Typography>
+                                        }
                                         {this.state.publicPhilosophy.map((item, index) => {
                                             return (
                                                 <Paper className={classes.paper + " " + classes.itemBottomMargin} key={index}>
@@ -402,4 +412,4 @@ export class Dashboard extends Component {
     }
 }
 
-export default withStyles(styles)(Dashboard);
+export default withStyles(styles)(connect()(Dashboard));
