@@ -132,13 +132,19 @@ class App extends Component {
           </div>
         </Drawer>
         <div className={classes.appBar}>
-          <AppBar position="static" className="our-gradient">
+          <AppBar position="static" className="our-gradient" style={{opacity: 0}}>
+            <Toolbar>
+            </Toolbar>
+          </AppBar>
+          <AppBar position="fixed" className="our-gradient">
             <Toolbar>
               <IconButton onClick={this.toggleDrawer('leftMenu', true)} className={classes.menuButton} color="inherit" aria-label="Menu">
                 <MenuIcon />
               </IconButton>
               <div className={classes.grow + " appbar-logo"}>
-                <img src={philosophy0xLogo} alt="Philosophy0x Logo"></img>
+                <a href="/" rel="noopener noreferrer">
+                  <img src={philosophy0xLogo} alt="Philosophy0x Logo"></img>
+                </a>
               </div>
               {this.state.userName ?
                 <React.Fragment>
@@ -149,9 +155,11 @@ class App extends Component {
                 </React.Fragment>
                 : 
                 <React.Fragment>
+                  {window.ethereum &&
                   <Fab onClick={this.handleLogin} variant="extended" color="secondary" className={classes.fab + " bold"}>
                     <FingerprintIcon className={classes.extendedIcon} />SIGN IN
                   </Fab>
+                  }
                 </React.Fragment>
               }
               
@@ -163,16 +171,21 @@ class App extends Component {
             {this.state.userName ? (
               <Dashboard specificNetworkAddress={this.state.specificNetworkAddress} />
             ) : (
-              <Grid item xs={12} className="login">
+              <div style={{padding: '15px'}}>
                   {window.ethereum && 
                     <Dashboard specificNetworkAddress={this.state.specificNetworkAddress} />
                   }
                   {!(window.ethereum && window.ethereum.isMetaMask) && 
-                  <p className="text-large" style={{paddingLeft: '15px'}}>This app uses MetaMask for login and transaction approvals.
-                      Download the MetaMask extension for your browser to begin. 
-                  <a href="https://metamask.io/" rel="noopener noreferrer" target="_blank">https://metamask.io/</a>
-                  </p>}
-                </Grid >
+                    <React.Fragment>
+                      <Typography component="h4" variant="h4" color="inherit" gutterBottom>
+                        Please download <a href="https://metamask.io/" rel="noopener noreferrer" target="_blank">MetaMask</a> to interface with Ethereum.
+                      </Typography>
+                      <Typography component="h7" variant="h7" color="inherit">
+                        Please <a href="/" rel="noopener noreferrer">refresh</a> this page once MetaMask is installed.
+                      </Typography>
+                    </React.Fragment>
+                  }
+                </div >
               )}
           </Grid>
         </Grid>
