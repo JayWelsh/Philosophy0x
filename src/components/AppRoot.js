@@ -63,11 +63,13 @@ class App extends Component {
         this.setState(reduxState.ethereumAccount);
       }
     })
-    window.ethereum.on('accountsChanged', function (accounts) {
-      if(thisPersist.state.specificNetworkAddress && (accounts[0] !== thisPersist.state.specificNetworkAddress)){
-        window.location.reload();
-      }
-    })
+    if (window.ethereum) {
+      window.ethereum.on('accountsChanged', function (accounts) {
+        if (thisPersist.state.specificNetworkAddress && (accounts[0] !== thisPersist.state.specificNetworkAddress)) {
+          window.location.reload();
+        }
+      })
+    }
   }
 
   componentDidUpdate() {
